@@ -4,64 +4,57 @@ syntax = "proto3";
 // กำหนด package สำหรับ Go (ใช้สำหรับ reference ภายใน go)
 option go_package = "auth-microservice/proto";
 
-// นิยาม service ชื่อ Greeter
+// นิยาม service ชื่อ AuthService สำหรับจัดการ Authentication
 service AuthService {
-  // กำหนด RPC method
+  // ลงทะเบียนผู้ใช้ใหม่
   rpc Register(RegisterRequest) returns (RegisterReply);
+
+  // เข้าสู่ระบบ (Login)
   rpc Login(LoginRequest) returns (LoginReply);
+
+  // ออกจากระบบ (Logout)
   rpc Logout(LogoutRequest) returns (LogoutReply);
-  rpc RequestPasswordReset(ResetRequest) returns (ResetResponse);
-  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordReply);
 }
 
-// นิยาม message สำหรับคำขอ
+// ข้อมูลสำหรับคำขอลงทะเบียนผู้ใช้ใหม่
 message RegisterRequest {
-    string email = 1;
-    string password = 2;
-    string username = 3;
-    string createdAt = 4;
-    string updatedAt = 5;
-    bool deleted = 6; // ใช้สำหรับ soft delete
-    string deletedAt = 7; // ใช้สำหรับ soft delete
-    string role = 8; // admin, user, 
+    string email = 1;          // อีเมลผู้ใช้
+    string password = 2;       // รหัสผ่าน
+    string username = 3;       // ชื่อผู้ใช้
+    string createdAt = 4;      // วันที่สร้างบัญชี (เก็บโดยระบบ)
+    string updatedAt = 5;      // วันที่อัปเดตล่าสุด (เก็บโดยระบบ)
+    bool deleted = 6;          // สถานะลบ (soft delete)
+    string deletedAt = 7;      // วันที่ลบ (soft delete)
+    string role = 8;           // บทบาท admin หรือ user
 }
-// นิยาม message สำหรับการตอบกลับ
+
+// ข้อมูลตอบกลับเมื่อสมัครสมาชิกสำเร็จ
 message RegisterReply { 
-    string email = 1;
-    string username = 2;
-    string  createdAt = 3;
+    string email = 1;          // อีเมลผู้ใช้
+    string username = 2;       // ชื่อผู้ใช้
+    string createdAt = 3;      // วันที่สร้างบัญชี
 }
+
+// ข้อมูลสำหรับคำขอเข้าสู่ระบบ
 message LoginRequest {
-    string email = 1;
-    string password = 2;
+    string email = 1;          // อีเมลผู้ใช้
+    string password = 2;       // รหัสผ่าน
 }
+
+// ข้อมูลตอบกลับเมื่อเข้าสู่ระบบสำเร็จ
 message LoginReply {
-    string email = 1;
-    string username = 2;
-    string token = 3; // ต้องมีฟิลด์นี้
+    string email = 1;          // อีเมลผู้ใช้
+    string username = 2;       // ชื่อผู้ใช้
+    string token = 3;          // JWT token สำหรับใช้ยืนยันตัวตนในระบบ
 }
+
+// ข้อมูลสำหรับคำขอออกจากระบบ
 message LogoutRequest {
-  string token = 1; //jwt token
+  string token = 1;            // JWT token ที่จะทำการ logout
 }
 
+// ข้อมูลตอบกลับเมื่อออกจากระบบสำเร็จ
 message LogoutReply {
-  string message = 1;     
-}
-message ResetRequest {
-  string email = 1;
+  string message = 1;          // ข้อความสถานะ เช่น "ออกจากระบบสำเร็จ"
 }
 
-message ResetResponse {
-  bool success = 1;
-  string message = 2;
-}
-
-message ResetPasswordRequest {
-  string token = 1;         
-  string new_password = 2; 
-}
-
-message ResetPasswordReply {
-  bool success = 1;
-  string message = 2;
-}

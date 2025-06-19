@@ -30,11 +30,16 @@ const (
 // UserServiceClient is the client API for UserService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// บริการ UserService สำหรับจัดการข้อมูลผู้ใช้
 type UserServiceClient interface {
-	// กำหนด RPC method
+	// ดึงข้อมูลผู้ใช้ตาม ID
 	GetUserById(ctx context.Context, in *UserIdRequest, opts ...grpc.CallOption) (*UserIdReply, error)
+	// อัปเดตข้อมูลผู้ใช้
 	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...grpc.CallOption) (*UpdateUserReply, error)
+	// ลบผู้ใช้ (soft delete)
 	DeleteUser(ctx context.Context, in *DeleteUserRequest, opts ...grpc.CallOption) (*DeleteUserReply, error)
+	// ดึงรายการผู้ใช้พร้อม pagination และกรองข้อมูล
 	ListUsers(ctx context.Context, in *ListUsersRequest, opts ...grpc.CallOption) (*ListUsersReply, error)
 }
 
@@ -89,11 +94,16 @@ func (c *userServiceClient) ListUsers(ctx context.Context, in *ListUsersRequest,
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
+//
+// บริการ UserService สำหรับจัดการข้อมูลผู้ใช้
 type UserServiceServer interface {
-	// กำหนด RPC method
+	// ดึงข้อมูลผู้ใช้ตาม ID
 	GetUserById(context.Context, *UserIdRequest) (*UserIdReply, error)
+	// อัปเดตข้อมูลผู้ใช้
 	UpdateUser(context.Context, *UpdateUserRequest) (*UpdateUserReply, error)
+	// ลบผู้ใช้ (soft delete)
 	DeleteUser(context.Context, *DeleteUserRequest) (*DeleteUserReply, error)
+	// ดึงรายการผู้ใช้พร้อม pagination และกรองข้อมูล
 	ListUsers(context.Context, *ListUsersRequest) (*ListUsersReply, error)
 	mustEmbedUnimplementedUserServiceServer()
 }

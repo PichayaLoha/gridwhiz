@@ -23,17 +23,17 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// นิยาม message สำหรับคำขอ
+// ข้อมูลสำหรับคำขอลงทะเบียนผู้ใช้ใหม่
 type RegisterRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,4,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,5,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
-	Deleted       bool                   `protobuf:"varint,6,opt,name=deleted,proto3" json:"deleted,omitempty"`    // ใช้สำหรับ soft delete
-	DeletedAt     string                 `protobuf:"bytes,7,opt,name=deletedAt,proto3" json:"deletedAt,omitempty"` // ใช้สำหรับ soft delete
-	Role          string                 `protobuf:"bytes,8,opt,name=role,proto3" json:"role,omitempty"`           // admin, user,
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`         // อีเมลผู้ใช้
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`   // รหัสผ่าน
+	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`   // ชื่อผู้ใช้
+	CreatedAt     string                 `protobuf:"bytes,4,opt,name=createdAt,proto3" json:"createdAt,omitempty"` // วันที่สร้างบัญชี (เก็บโดยระบบ)
+	UpdatedAt     string                 `protobuf:"bytes,5,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"` // วันที่อัปเดตล่าสุด (เก็บโดยระบบ)
+	Deleted       bool                   `protobuf:"varint,6,opt,name=deleted,proto3" json:"deleted,omitempty"`    // สถานะลบ (soft delete)
+	DeletedAt     string                 `protobuf:"bytes,7,opt,name=deletedAt,proto3" json:"deletedAt,omitempty"` // วันที่ลบ (soft delete)
+	Role          string                 `protobuf:"bytes,8,opt,name=role,proto3" json:"role,omitempty"`           // บทบาท admin หรือ user
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -124,12 +124,12 @@ func (x *RegisterRequest) GetRole() string {
 	return ""
 }
 
-// นิยาม message สำหรับการตอบกลับ
+// ข้อมูลตอบกลับเมื่อสมัครสมาชิกสำเร็จ
 type RegisterReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,3,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`         // อีเมลผู้ใช้
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`   // ชื่อผู้ใช้
+	CreatedAt     string                 `protobuf:"bytes,3,opt,name=createdAt,proto3" json:"createdAt,omitempty"` // วันที่สร้างบัญชี
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -185,10 +185,11 @@ func (x *RegisterReply) GetCreatedAt() string {
 	return ""
 }
 
+// ข้อมูลสำหรับคำขอเข้าสู่ระบบ
 type LoginRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`       // อีเมลผู้ใช้
+	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"` // รหัสผ่าน
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -237,11 +238,12 @@ func (x *LoginRequest) GetPassword() string {
 	return ""
 }
 
+// ข้อมูลตอบกลับเมื่อเข้าสู่ระบบสำเร็จ
 type LoginReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	Token         string                 `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"` // ต้องมีฟิลด์นี้
+	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`       // อีเมลผู้ใช้
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"` // ชื่อผู้ใช้
+	Token         string                 `protobuf:"bytes,3,opt,name=token,proto3" json:"token,omitempty"`       // JWT token สำหรับใช้ยืนยันตัวตนในระบบ
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -297,9 +299,10 @@ func (x *LoginReply) GetToken() string {
 	return ""
 }
 
+// ข้อมูลสำหรับคำขอออกจากระบบ
 type LogoutRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"` //jwt token
+	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"` // JWT token ที่จะทำการ logout
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -341,9 +344,10 @@ func (x *LogoutRequest) GetToken() string {
 	return ""
 }
 
+// ข้อมูลตอบกลับเมื่อออกจากระบบสำเร็จ
 type LogoutReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"` // ข้อความสถานะ เช่น "ออกจากระบบสำเร็จ"
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -385,206 +389,6 @@ func (x *LogoutReply) GetMessage() string {
 	return ""
 }
 
-type ResetRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Email         string                 `protobuf:"bytes,1,opt,name=email,proto3" json:"email,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ResetRequest) Reset() {
-	*x = ResetRequest{}
-	mi := &file_proto_auth_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ResetRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ResetRequest) ProtoMessage() {}
-
-func (x *ResetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_auth_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ResetRequest.ProtoReflect.Descriptor instead.
-func (*ResetRequest) Descriptor() ([]byte, []int) {
-	return file_proto_auth_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *ResetRequest) GetEmail() string {
-	if x != nil {
-		return x.Email
-	}
-	return ""
-}
-
-type ResetResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ResetResponse) Reset() {
-	*x = ResetResponse{}
-	mi := &file_proto_auth_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ResetResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ResetResponse) ProtoMessage() {}
-
-func (x *ResetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_auth_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ResetResponse.ProtoReflect.Descriptor instead.
-func (*ResetResponse) Descriptor() ([]byte, []int) {
-	return file_proto_auth_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *ResetResponse) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *ResetResponse) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-type ResetPasswordRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	NewPassword   string                 `protobuf:"bytes,2,opt,name=new_password,json=newPassword,proto3" json:"new_password,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ResetPasswordRequest) Reset() {
-	*x = ResetPasswordRequest{}
-	mi := &file_proto_auth_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ResetPasswordRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ResetPasswordRequest) ProtoMessage() {}
-
-func (x *ResetPasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_auth_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ResetPasswordRequest.ProtoReflect.Descriptor instead.
-func (*ResetPasswordRequest) Descriptor() ([]byte, []int) {
-	return file_proto_auth_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *ResetPasswordRequest) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
-}
-
-func (x *ResetPasswordRequest) GetNewPassword() string {
-	if x != nil {
-		return x.NewPassword
-	}
-	return ""
-}
-
-type ResetPasswordReply struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ResetPasswordReply) Reset() {
-	*x = ResetPasswordReply{}
-	mi := &file_proto_auth_proto_msgTypes[9]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ResetPasswordReply) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ResetPasswordReply) ProtoMessage() {}
-
-func (x *ResetPasswordReply) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_auth_proto_msgTypes[9]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ResetPasswordReply.ProtoReflect.Descriptor instead.
-func (*ResetPasswordReply) Descriptor() ([]byte, []int) {
-	return file_proto_auth_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *ResetPasswordReply) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *ResetPasswordReply) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
 var File_proto_auth_proto protoreflect.FileDescriptor
 
 const file_proto_auth_proto_rawDesc = "" +
@@ -614,24 +418,11 @@ const file_proto_auth_proto_rawDesc = "" +
 	"\rLogoutRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\"'\n" +
 	"\vLogoutReply\x12\x18\n" +
-	"\amessage\x18\x01 \x01(\tR\amessage\"$\n" +
-	"\fResetRequest\x12\x14\n" +
-	"\x05email\x18\x01 \x01(\tR\x05email\"C\n" +
-	"\rResetResponse\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"O\n" +
-	"\x14ResetPasswordRequest\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\x12!\n" +
-	"\fnew_password\x18\x02 \x01(\tR\vnewPassword\"H\n" +
-	"\x12ResetPasswordReply\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage2\xfc\x01\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage2\x88\x01\n" +
 	"\vAuthService\x12,\n" +
 	"\bRegister\x12\x10.RegisterRequest\x1a\x0e.RegisterReply\x12#\n" +
 	"\x05Login\x12\r.LoginRequest\x1a\v.LoginReply\x12&\n" +
-	"\x06Logout\x12\x0e.LogoutRequest\x1a\f.LogoutReply\x125\n" +
-	"\x14RequestPasswordReset\x12\r.ResetRequest\x1a\x0e.ResetResponse\x12;\n" +
-	"\rResetPassword\x12\x15.ResetPasswordRequest\x1a\x13.ResetPasswordReplyB\x19Z\x17auth-microservice/protob\x06proto3"
+	"\x06Logout\x12\x0e.LogoutRequest\x1a\f.LogoutReplyB\x19Z\x17auth-microservice/protob\x06proto3"
 
 var (
 	file_proto_auth_proto_rawDescOnce sync.Once
@@ -645,32 +436,24 @@ func file_proto_auth_proto_rawDescGZIP() []byte {
 	return file_proto_auth_proto_rawDescData
 }
 
-var file_proto_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
+var file_proto_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_proto_auth_proto_goTypes = []any{
-	(*RegisterRequest)(nil),      // 0: RegisterRequest
-	(*RegisterReply)(nil),        // 1: RegisterReply
-	(*LoginRequest)(nil),         // 2: LoginRequest
-	(*LoginReply)(nil),           // 3: LoginReply
-	(*LogoutRequest)(nil),        // 4: LogoutRequest
-	(*LogoutReply)(nil),          // 5: LogoutReply
-	(*ResetRequest)(nil),         // 6: ResetRequest
-	(*ResetResponse)(nil),        // 7: ResetResponse
-	(*ResetPasswordRequest)(nil), // 8: ResetPasswordRequest
-	(*ResetPasswordReply)(nil),   // 9: ResetPasswordReply
+	(*RegisterRequest)(nil), // 0: RegisterRequest
+	(*RegisterReply)(nil),   // 1: RegisterReply
+	(*LoginRequest)(nil),    // 2: LoginRequest
+	(*LoginReply)(nil),      // 3: LoginReply
+	(*LogoutRequest)(nil),   // 4: LogoutRequest
+	(*LogoutReply)(nil),     // 5: LogoutReply
 }
 var file_proto_auth_proto_depIdxs = []int32{
 	0, // 0: AuthService.Register:input_type -> RegisterRequest
 	2, // 1: AuthService.Login:input_type -> LoginRequest
 	4, // 2: AuthService.Logout:input_type -> LogoutRequest
-	6, // 3: AuthService.RequestPasswordReset:input_type -> ResetRequest
-	8, // 4: AuthService.ResetPassword:input_type -> ResetPasswordRequest
-	1, // 5: AuthService.Register:output_type -> RegisterReply
-	3, // 6: AuthService.Login:output_type -> LoginReply
-	5, // 7: AuthService.Logout:output_type -> LogoutReply
-	7, // 8: AuthService.RequestPasswordReset:output_type -> ResetResponse
-	9, // 9: AuthService.ResetPassword:output_type -> ResetPasswordReply
-	5, // [5:10] is the sub-list for method output_type
-	0, // [0:5] is the sub-list for method input_type
+	1, // 3: AuthService.Register:output_type -> RegisterReply
+	3, // 4: AuthService.Login:output_type -> LoginReply
+	5, // 5: AuthService.Logout:output_type -> LogoutReply
+	3, // [3:6] is the sub-list for method output_type
+	0, // [0:3] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name
@@ -687,7 +470,7 @@ func file_proto_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_auth_proto_rawDesc), len(file_proto_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -23,10 +23,10 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// message สำหรับคำขอ
+// ข้อมูลสำหรับคำขอ ดึงผู้ใช้ตาม ID
 type UserIdRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // ID ของผู้ใช้ (ObjectID ในรูปแบบ string)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -68,14 +68,14 @@ func (x *UserIdRequest) GetId() string {
 	return ""
 }
 
-// message สำหรับการตอบกลับ
+// ข้อมูลตอบกลับเมื่อดึงผู้ใช้ตาม ID สำเร็จ
 type UserIdReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,4,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	UpdatedAt     string                 `protobuf:"bytes,5,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`               // ID ของผู้ใช้
+	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`         // อีเมลของผู้ใช้
+	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`   // ชื่อผู้ใช้
+	CreatedAt     string                 `protobuf:"bytes,4,opt,name=createdAt,proto3" json:"createdAt,omitempty"` // วันที่สร้างบัญชี
+	UpdatedAt     string                 `protobuf:"bytes,5,opt,name=updatedAt,proto3" json:"updatedAt,omitempty"` // วันที่อัปเดตข้อมูลล่าสุด
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -145,11 +145,11 @@ func (x *UserIdReply) GetUpdatedAt() string {
 	return ""
 }
 
+// ข้อมูลสำหรับคำขออัปเดตผู้ใช้
 type UpdateUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`             // ID ของผู้ใช้ที่ต้องการอัปเดต
+	Username      string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"` // ชื่อผู้ใช้ใหม่
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -191,13 +191,6 @@ func (x *UpdateUserRequest) GetId() string {
 	return ""
 }
 
-func (x *UpdateUserRequest) GetEmail() string {
-	if x != nil {
-		return x.Email
-	}
-	return ""
-}
-
 func (x *UpdateUserRequest) GetUsername() string {
 	if x != nil {
 		return x.Username
@@ -205,9 +198,10 @@ func (x *UpdateUserRequest) GetUsername() string {
 	return ""
 }
 
+// ข้อมูลตอบกลับเมื่ออัปเดตผู้ใช้สำเร็จ
 type UpdateUserReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"` // ข้อความสถานะ เช่น "อัปเดตข้อมูลผู้ใช้สำเร็จ"
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -249,9 +243,10 @@ func (x *UpdateUserReply) GetMessage() string {
 	return ""
 }
 
+// ข้อมูลสำหรับคำขอลบผู้ใช้
 type DeleteUserRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"` // ID ของผู้ใช้ที่ต้องการลบ (soft delete)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -293,9 +288,10 @@ func (x *DeleteUserRequest) GetId() string {
 	return ""
 }
 
+// ข้อมูลตอบกลับเมื่อทำการลบผู้ใช้สำเร็จ
 type DeleteUserReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"` // ข้อความสถานะ เช่น "ลบข้อมูลผู้ใช้สำเร็จ"
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -337,14 +333,15 @@ func (x *DeleteUserReply) GetMessage() string {
 	return ""
 }
 
+// ข้อมูลสำหรับคำขอรายการผู้ใช้ (พร้อมตัวกรองและ pagination)
 type ListUsersRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`   // หน้าที่ต้องการดู
-	Limit         int32                  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"` // จำนวนต่อหน้า
-	Role          string                 `protobuf:"bytes,5,opt,name=role,proto3" json:"role,omitempty"`    // กรองตามบทบาท เช่น admin, user
-	Token         string                 `protobuf:"bytes,6,opt,name=token,proto3" json:"token,omitempty"`  // JWT token สำหรับการยืนยันตัวตน
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`    // ชื่อผู้ใช้ (username) สำหรับกรอง (ค้นหาแบบใกล้เคียง)
+	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`  // อีเมลสำหรับกรอง (ค้นหาแบบใกล้เคียง)
+	Page          int32                  `protobuf:"varint,3,opt,name=page,proto3" json:"page,omitempty"`   // หมายเลขหน้าที่ต้องการดู (เริ่มต้นที่ 1)
+	Limit         int32                  `protobuf:"varint,4,opt,name=limit,proto3" json:"limit,omitempty"` // จำนวนรายการต่อหน้า
+	Role          string                 `protobuf:"bytes,5,opt,name=role,proto3" json:"role,omitempty"`    // กรองตามบทบาทผู้ใช้ เช่น "admin" หรือ "user"
+	Token         string                 `protobuf:"bytes,6,opt,name=token,proto3" json:"token,omitempty"`  // JWT token สำหรับตรวจสอบสิทธิ์ (authorization)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -421,10 +418,11 @@ func (x *ListUsersRequest) GetToken() string {
 	return ""
 }
 
+// ข้อมูลตอบกลับรายการผู้ใช้ พร้อมจำนวนรวมทั้งหมด
 type ListUsersReply struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Users         []*UserItem            `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"` //repeated = array
-	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	Users         []*UserItem            `protobuf:"bytes,1,rep,name=users,proto3" json:"users,omitempty"`  // รายการผู้ใช้ (array)
+	Total         int32                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"` // จำนวนผู้ใช้ทั้งหมดที่ตรงกับเงื่อนไข
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -473,13 +471,14 @@ func (x *ListUsersReply) GetTotal() int32 {
 	return 0
 }
 
+// โครงสร้างข้อมูลผู้ใช้แต่ละรายการใน ListUsersReply
 type UserItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`
-	CreatedAt     string                 `protobuf:"bytes,4,opt,name=createdAt,proto3" json:"createdAt,omitempty"`
-	Role          string                 `protobuf:"bytes,5,opt,name=role,proto3" json:"role,omitempty"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`               // ID ของผู้ใช้
+	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`         // อีเมลของผู้ใช้
+	Username      string                 `protobuf:"bytes,3,opt,name=username,proto3" json:"username,omitempty"`   // ชื่อผู้ใช้
+	CreatedAt     string                 `protobuf:"bytes,4,opt,name=createdAt,proto3" json:"createdAt,omitempty"` // วันที่สร้างบัญชี
+	Role          string                 `protobuf:"bytes,5,opt,name=role,proto3" json:"role,omitempty"`           // บทบาทของผู้ใช้ admin, user
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -561,11 +560,10 @@ const file_proto_user_proto_rawDesc = "" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
 	"\busername\x18\x03 \x01(\tR\busername\x12\x1c\n" +
 	"\tcreatedAt\x18\x04 \x01(\tR\tcreatedAt\x12\x1c\n" +
-	"\tupdatedAt\x18\x05 \x01(\tR\tupdatedAt\"U\n" +
+	"\tupdatedAt\x18\x05 \x01(\tR\tupdatedAt\"?\n" +
 	"\x11UpdateUserRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x12\x1a\n" +
-	"\busername\x18\x03 \x01(\tR\busername\"+\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\"+\n" +
 	"\x0fUpdateUserReply\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage\"#\n" +
 	"\x11DeleteUserRequest\x12\x0e\n" +

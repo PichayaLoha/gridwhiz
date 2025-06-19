@@ -4,64 +4,77 @@ syntax = "proto3";
 // กำหนด package สำหรับ Go (ใช้สำหรับ reference ภายใน go)
 option go_package = "auth-microservice/proto";
 
+// บริการ UserService สำหรับจัดการข้อมูลผู้ใช้
 service UserService {
-  // กำหนด RPC method
+  // ดึงข้อมูลผู้ใช้ตาม ID
   rpc GetUserById(UserIdRequest) returns (UserIdReply) {}
+
+  // อัปเดตข้อมูลผู้ใช้
   rpc UpdateUser(UpdateUserRequest) returns (UpdateUserReply) {}
-   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserReply) {}
-   rpc ListUsers(ListUsersRequest) returns (ListUsersReply) {}
+
+  // ลบผู้ใช้ (soft delete)
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserReply) {}
+
+  // ดึงรายการผู้ใช้พร้อม pagination และกรองข้อมูล
+  rpc ListUsers(ListUsersRequest) returns (ListUsersReply) {}
 }
 
-// message สำหรับคำขอ
+// ข้อมูลสำหรับคำขอ ดึงผู้ใช้ตาม ID
 message UserIdRequest {
-    string id = 1;
+  string id = 1; // ID ของผู้ใช้ (ObjectID ในรูปแบบ string)
 }
 
-//message สำหรับการตอบกลับ
+// ข้อมูลตอบกลับเมื่อดึงผู้ใช้ตาม ID สำเร็จ
 message UserIdReply { 
-    string id = 1;
-    string email = 2;   
-    string username = 3;
-    string createdAt = 4;
-    string updatedAt = 5;
-    
+  string id = 1;         // ID ของผู้ใช้
+  string email = 2;      // อีเมลของผู้ใช้
+  string username = 3;   // ชื่อผู้ใช้
+  string createdAt = 4;  // วันที่สร้างบัญชี 
+  string updatedAt = 5;  // วันที่อัปเดตข้อมูลล่าสุด
 }
 
+// ข้อมูลสำหรับคำขออัปเดตผู้ใช้
 message UpdateUserRequest {
-  string id = 1;
-  string email = 2;
-  string username = 3;
+  string id = 1;         // ID ของผู้ใช้ที่ต้องการอัปเดต
+  string username = 2;   // ชื่อผู้ใช้ใหม่
 }
 
+// ข้อมูลตอบกลับเมื่ออัปเดตผู้ใช้สำเร็จ
 message UpdateUserReply {
-  string message = 1;
+  string message = 1;    // ข้อความสถานะ เช่น "อัปเดตข้อมูลผู้ใช้สำเร็จ"
 }
 
+// ข้อมูลสำหรับคำขอลบผู้ใช้
 message DeleteUserRequest {
-  string id = 1;
+  string id = 1;         // ID ของผู้ใช้ที่ต้องการลบ (soft delete)
 }
 
+// ข้อมูลตอบกลับเมื่อทำการลบผู้ใช้สำเร็จ
 message DeleteUserReply {
-  string message = 1;
+  string message = 1;    // ข้อความสถานะ เช่น "ลบข้อมูลผู้ใช้สำเร็จ"
 }
 
+// ข้อมูลสำหรับคำขอรายการผู้ใช้ (พร้อมตัวกรองและ pagination)
 message ListUsersRequest {
-  string name = 1;     
-  string email = 2;    
-  int32 page = 3;      // หน้าที่ต้องการดู
-  int32 limit = 4;     // จำนวนต่อหน้า
-  string role = 5;       // กรองตามบทบาท เช่น admin, user
-  string token = 6; // JWT token สำหรับการยืนยันตัวตน
-  
+  string name = 1;       // ชื่อผู้ใช้ (username) สำหรับกรอง (ค้นหาแบบใกล้เคียง)
+  string email = 2;      // อีเมลสำหรับกรอง (ค้นหาแบบใกล้เคียง)
+  int32 page = 3;        // หมายเลขหน้าที่ต้องการดู (เริ่มต้นที่ 1)
+  int32 limit = 4;       // จำนวนรายการต่อหน้า
+  string role = 5;       // กรองตามบทบาทผู้ใช้ เช่น "admin" หรือ "user"
+  string token = 6;      // JWT token สำหรับตรวจสอบสิทธิ์ (authorization)
 }
+
+// ข้อมูลตอบกลับรายการผู้ใช้ พร้อมจำนวนรวมทั้งหมด
 message ListUsersReply {
-  repeated UserItem users = 1; //repeated = array
-  int32 total = 2;
+  repeated UserItem users = 1; // รายการผู้ใช้ (array)
+  int32 total = 2;             // จำนวนผู้ใช้ทั้งหมดที่ตรงกับเงื่อนไข
 }
+
+// โครงสร้างข้อมูลผู้ใช้แต่ละรายการใน ListUsersReply
 message UserItem {
-  string id = 1;
-  string email = 2;
-  string username = 3;
-  string createdAt = 4;
-  string role = 5;
+  string id = 1;         // ID ของผู้ใช้
+  string email = 2;      // อีเมลของผู้ใช้
+  string username = 3;   // ชื่อผู้ใช้
+  string createdAt = 4;  // วันที่สร้างบัญชี 
+  string role = 5;       // บทบาทของผู้ใช้ admin, user
 }
