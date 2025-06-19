@@ -1,0 +1,67 @@
+// กำหนด version ของ Protocol Buffers ที่ใช้
+syntax = "proto3";
+
+// กำหนด package สำหรับ Go (ใช้สำหรับ reference ภายใน go)
+option go_package = "auth-microservice/proto";
+
+// นิยาม service ชื่อ Greeter
+service AuthService {
+  // กำหนด RPC method
+  rpc Register(RegisterRequest) returns (RegisterReply);
+  rpc Login(LoginRequest) returns (LoginReply);
+  rpc Logout(LogoutRequest) returns (LogoutReply);
+  rpc RequestPasswordReset(ResetRequest) returns (ResetResponse);
+  rpc ResetPassword(ResetPasswordRequest) returns (ResetPasswordReply);
+}
+
+// นิยาม message สำหรับคำขอ
+message RegisterRequest {
+    string email = 1;
+    string password = 2;
+    string username = 3;
+    string createdAt = 4;
+    string updatedAt = 5;
+    bool deleted = 6; // ใช้สำหรับ soft delete
+    string deletedAt = 7; // ใช้สำหรับ soft delete
+    string role = 8; // admin, user, 
+}
+// นิยาม message สำหรับการตอบกลับ
+message RegisterReply { 
+    string email = 1;
+    string username = 2;
+    string  createdAt = 3;
+}
+message LoginRequest {
+    string email = 1;
+    string password = 2;
+}
+message LoginReply {
+    string email = 1;
+    string username = 2;
+    string token = 3; // ต้องมีฟิลด์นี้
+}
+message LogoutRequest {
+  string token = 1; //jwt token
+}
+
+message LogoutReply {
+  string message = 1;     
+}
+message ResetRequest {
+  string email = 1;
+}
+
+message ResetResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message ResetPasswordRequest {
+  string token = 1;         
+  string new_password = 2; 
+}
+
+message ResetPasswordReply {
+  bool success = 1;
+  string message = 2;
+}

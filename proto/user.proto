@@ -1,0 +1,67 @@
+// กำหนด version ของ Protocol Buffers ที่ใช้
+syntax = "proto3";
+
+// กำหนด package สำหรับ Go (ใช้สำหรับ reference ภายใน go)
+option go_package = "auth-microservice/proto";
+
+service UserService {
+  // กำหนด RPC method
+  rpc GetUserById(UserIdRequest) returns (UserIdReply) {}
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserReply) {}
+   rpc DeleteUser(DeleteUserRequest) returns (DeleteUserReply) {}
+   rpc ListUsers(ListUsersRequest) returns (ListUsersReply) {}
+}
+
+// message สำหรับคำขอ
+message UserIdRequest {
+    string id = 1;
+}
+
+//message สำหรับการตอบกลับ
+message UserIdReply { 
+    string id = 1;
+    string email = 2;   
+    string username = 3;
+    string createdAt = 4;
+    string updatedAt = 5;
+    
+}
+
+message UpdateUserRequest {
+  string id = 1;
+  string email = 2;
+  string username = 3;
+}
+
+message UpdateUserReply {
+  string message = 1;
+}
+
+message DeleteUserRequest {
+  string id = 1;
+}
+
+message DeleteUserReply {
+  string message = 1;
+}
+
+message ListUsersRequest {
+  string name = 1;     
+  string email = 2;    
+  int32 page = 3;      // หน้าที่ต้องการดู
+  int32 limit = 4;     // จำนวนต่อหน้า
+  string role = 5;       // กรองตามบทบาท เช่น admin, user
+  string token = 6; // JWT token สำหรับการยืนยันตัวตน
+  
+}
+message ListUsersReply {
+  repeated UserItem users = 1; //repeated = array
+  int32 total = 2;
+}
+message UserItem {
+  string id = 1;
+  string email = 2;
+  string username = 3;
+  string createdAt = 4;
+  string role = 5;
+}
