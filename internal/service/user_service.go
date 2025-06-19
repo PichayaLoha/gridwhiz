@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -15,6 +14,7 @@ import (
 
 	pb "auth-microservice/auth-microservice/proto"
 	"auth-microservice/internal/auth"
+	models "auth-microservice/internal/model"
 	"auth-microservice/internal/validation"
 )
 
@@ -25,30 +25,25 @@ func (s *UserService) GetUserById(ctx context.Context, in *pb.UserIdRequest) (*p
 		return nil, status.Error(codes.InvalidArgument, "ไอดีไม่ถูกต้อง")
 	}
 
+	// กำหนด filte
 	filter := bson.M{
 		"_id":     objID,
 		"deleted": bson.M{"$ne": true}, // ดึงเฉพาะที่ยังไม่ถูกลบ != true
 	}
 
-	var user struct {
-		ID        primitive.ObjectID `bson:"_id"`
-		Email     string             `bson:"email"`
-		Username  string             `bson:"username"`
-		CreatedAt time.Time          `bson:"createdAt"`
-		UpdatedAt time.Time          `bson:"updatedAt"`
-	}
-
-	err = s.UserCollection.FindOne(ctx, filter).Decode(&user)
+	// ดึงข้อมูลผู้ใช้จาก MongoDB
+	err = s.UserCollection.FindOne(ctx, filter).Decode(&models.User)
 	if err != nil {
 		return nil, status.Error(codes.NotFound, "ไม่พบผู้ใช้")
 	}
 
+	// ส่งข้อมูลกลับในรูปแบบ protobuf
 	return &pb.UserIdReply{
-		Id:        user.ID.Hex(),
-		Email:     user.Email,
-		Username:  user.Username,
-		CreatedAt: user.CreatedAt.Format(time.RFC3339),
-		UpdatedAt: user.UpdatedAt.Format(time.RFC3339),
+		Id:        models.User.ID.Hex(),
+		Email:     models.User.Email,
+		Username:  models.User.Username,
+		CreatedAt: models.User.CreatedAt.Format(time.RFC3339),
+		UpdatedAt: models.User.UpdatedAt.Format(time.RFC3339),
 	}, nil
 }
 
@@ -58,22 +53,24 @@ func (s *UserService) UpdateUser(ctx context.Context, in *pb.UpdateUserRequest) 
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "ID ไม่ถูกต้อง")
 	}
-	if err := validation.ValidateEmail(in.GetEmail(), ctx, s.UserCollection); err != nil {
-		return nil, err
-	}
+
+	// ตรวจสอบความถูกต้องของ username
 	if err := validation.ValidateUsername(in.GetUsername(), ctx, s.UserCollection); err != nil {
 		return nil, err
 	}
+
+	// กำหนดข้อมูลที่จะอัปเดต
 	update := bson.M{
 		"$set": bson.M{
-			"email":     in.GetEmail(),
 			"username":  in.GetUsername(),
 			"updatedAt": time.Now(),
 		},
 	}
 
+	// อัปเดตข้อมูลใน MongoDB
 	filter := bson.M{"_id": objID}
 
+	// เช็คว่ามีผู้ใช้ตรงกับ id หรือไม่
 	result, err := s.UserCollection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "เกิดข้อผิดพลาดในการอัปเดตข้อมูล")
@@ -88,11 +85,13 @@ func (s *UserService) UpdateUser(ctx context.Context, in *pb.UpdateUserRequest) 
 	}, nil
 }
 func (s *UserService) DeleteUser(ctx context.Context, in *pb.DeleteUserRequest) (*pb.DeleteUserReply, error) {
+	// แปลง id จาก string เป็น MongoDB ObjectID
 	objID, err := primitive.ObjectIDFromHex(in.GetId())
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, "ID ไม่ถูกต้อง")
 	}
 
+	//filter
 	filter := bson.M{"_id": objID, "deleted": bson.M{"$ne": true}} // ต้องไม่ถูกลบอยู่ก่อนแล้ว
 	update := bson.M{
 		"$set": bson.M{
@@ -101,11 +100,13 @@ func (s *UserService) DeleteUser(ctx context.Context, in *pb.DeleteUserRequest) 
 		},
 	}
 
+	// อัปเดตข้อมูล
 	result, err := s.UserCollection.UpdateOne(ctx, filter, update)
 	if err != nil {
 		return nil, status.Error(codes.Internal, "เกิดข้อผิดพลาดในการลบผู้ใช้")
 	}
 
+	// เช็คว่ามีผู้ใช้ตรงกับ id หรือไม่ หรือถูกลบไปแล้ว
 	if result.MatchedCount == 0 {
 		return nil, status.Error(codes.NotFound, "ไม่พบผู้ใช้ที่ต้องการลบหรือถูกลบไปแล้ว")
 	}
@@ -115,12 +116,13 @@ func (s *UserService) DeleteUser(ctx context.Context, in *pb.DeleteUserRequest) 
 	}, nil
 }
 func (s *UserService) ListUsers(ctx context.Context, in *pb.ListUsersRequest) (*pb.ListUsersReply, error) {
-	// log.Println("ListUsers called with:", in)
-	// log.Printf("ListUsers called: name=%s email=%s page=%d limit=%d", in.GetName(), in.GetEmail(), in.GetPage(), in.GetLimit())
+	// ดึง metadata จาก context
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
 		return nil, status.Error(codes.Unauthenticated, "missing metadata")
 	}
+
+	// ดึงค่า authorization header
 	authHeaders := md["authorization"]
 	if len(authHeaders) == 0 {
 		return nil, status.Error(codes.Unauthenticated, "authorization token is not supplied")
@@ -133,14 +135,14 @@ func (s *UserService) ListUsers(ctx context.Context, in *pb.ListUsersRequest) (*
 	}
 
 	// เรียก ParseToken โดยส่ง token string
+	// ตรวจสอบและแปลง token เป็น claims
 	claims, err := auth.ParseToken(tokenStr)
 	if err != nil {
 		return nil, status.Error(codes.Unauthenticated, "invalid token")
 	}
 
-	// ตรวจสอบ role จาก claims map
+	// ตรวจสอบ role  == admin
 	role, ok := claims["role"].(string)
-	fmt.Println("User role from token:", role)
 	if !ok || role != "admin" {
 		return nil, status.Error(codes.PermissionDenied, "permission denied: admin role required")
 	}
@@ -155,7 +157,7 @@ func (s *UserService) ListUsers(ctx context.Context, in *pb.ListUsersRequest) (*
 		filter["email"] = bson.M{"$regex": in.GetEmail(), "$options": "i"}
 	}
 
-	// Pagination
+	// กำหนดค่าการแบ่งหน้า
 	page := in.GetPage()
 	if page < 1 {
 		page = 1
@@ -199,6 +201,7 @@ func (s *UserService) ListUsers(ctx context.Context, in *pb.ListUsersRequest) (*
 		return nil, status.Error(codes.Internal, "ไม่สามารถนับผู้ใช้ทั้งหมดได้")
 	}
 
+	// ส่งข้อมูลกลับเป็น protobuf
 	return &pb.ListUsersReply{
 		Users: users,
 		Total: int32(total),
