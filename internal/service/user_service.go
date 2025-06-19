@@ -144,7 +144,7 @@ func (s *UserService) ListUsers(ctx context.Context, in *pb.ListUsersRequest) (*
 	// ตรวจสอบ role  == admin
 	role, ok := claims["role"].(string)
 	if !ok || role != "admin" {
-		return nil, status.Error(codes.PermissionDenied, "permission denied: admin role required")
+		return nil, status.Error(codes.PermissionDenied, "สามารถดูได้เฉพาะ Admin เท่านั้น")
 	}
 	// สร้าง filter ค้นหา (ไม่รวมผู้ถูกลบ)
 	filter := bson.M{"deleted": bson.M{"$ne": true}}

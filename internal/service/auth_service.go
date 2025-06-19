@@ -63,7 +63,7 @@ func (s *AuthService) Register(ctx context.Context, in *pb.RegisterRequest) (*pb
 
 func (s *AuthService) Login(ctx context.Context, in *pb.LoginRequest) (*pb.LoginReply, error) {
 	// สร้าง filter เพื่อค้นหาผู้ใช้จาก email
-	filter := bson.M{"email": in.GetEmail()}
+	filter := bson.M{"email": in.GetEmail(), "deleted": bson.M{"$ne": true}}
 
 	var user map[string]interface{}
 
