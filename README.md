@@ -102,3 +102,4 @@ go run main.go
 - JWT token หมดอายุทุก 5 นาที
 - ต้องใช้ Docker Desktop ในการรัน Redis
 - Redis ใช้เก็บ active token และนับ login attempts สำหรับ rate limiting
+- ไม่มีระบบ Reset password 
