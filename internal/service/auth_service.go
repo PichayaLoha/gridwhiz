@@ -199,3 +199,57 @@ func (s *AuthService) Logout(ctx context.Context, in *pb.LogoutRequest) (*pb.Log
 		Message: "ออกจากระบบสำเร็จ",
 	}, nil
 }
+
+// func (s *AuthService) RegisterBulkUsers(ctx context.Context, count int) error {
+// 	const batchSize = 1000
+
+// 	var wg sync.WaitGroup
+// 	sem := make(chan struct{}, 10) // จำกัด concurrency สูงสุด 10 batch พร้อมกัน
+
+// 	startTime := time.Now()
+
+// 	for i := 0; i < count; i += batchSize {
+// 		wg.Add(1)
+// 		sem <- struct{}{}
+
+// 		go func(start int) {
+// 			defer wg.Done()
+// 			defer func() { <-sem }()
+
+// 			var users []interface{}
+// 			now := time.Now()
+
+// 			for j := start; j < start+batchSize && j < count; j++ {
+// 				email := fmt.Sprintf("bulkuser%06d@example.com", j)
+// 				username := fmt.Sprintf("bulkuser%06d", j)
+// 				password := "Password123!"
+
+// 				// เข้ารหัสรหัสผ่านเลย โดยไม่เช็คซ้ำ
+// 				hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+
+// 				user := bson.M{
+// 					"email":     email,
+// 					"username":  username,
+// 					"password":  string(hashedPassword),
+// 					"createdAt": now,
+// 					"updatedAt": now,
+// 					"deleted":   false,
+// 					"deletedAt": nil,
+// 					"role":      "user",
+// 				}
+// 				users = append(users, user)
+// 			}
+
+// 			_, err := s.UserCollection.InsertMany(ctx, users)
+// 			if err != nil {
+// 				log.Printf("❌ Insert batch %d-%d failed: %v", start, start+batchSize, err)
+// 			} else {
+// 				log.Printf("✅ Inserted batch %d-%d", start, start+batchSize)
+// 			}
+// 		}(i)
+// 	}
+
+// 	wg.Wait()
+// 	log.Printf("🎉 Bulk register %d users completed in %s", count, time.Since(startTime))
+// 	return nil
+// }

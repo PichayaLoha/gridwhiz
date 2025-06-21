@@ -16,7 +16,7 @@ type AuthService struct {
 }
 
 // สร้างอินสแตนซ์ของ AuthService พร้อมกำหนด collection และ redis client
-func NewAuthService(userCol *mongo.Collection, blacklistCol *mongo.Collection, rdb *redis.Client) *AuthService {
+func NewAuthService(userCol *mongo.Collection, blacklistCol *mongo.Collection, rdb *redis.Client) *AuthService { //dependecy injection
 	return &AuthService{
 		UserCollection:      userCol,
 		BlacklistCollection: blacklistCol,
